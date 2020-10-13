@@ -12,13 +12,7 @@ class MapsState with ChangeNotifier {
   List<Marker> _markers = [];
   MapType _mapType = MapType.normal;
   Completer<GoogleMapController> _controller = Completer();
-  bool _currentLocation = false;
 
-  bool get currentLocation => _currentLocation;
-
-  set currentLocation(bool value) {
-    _currentLocation = value;
-  }
 
   MapType get mapType => _mapType;
 
@@ -74,7 +68,7 @@ class MapsState with ChangeNotifier {
     ));
     PolylinePoints polylinePoints = PolylinePoints();
     List<LatLng> polylineCoordinates = [];
-    LatLng destination = new LatLng(point2.latitude, point2.longitude)
+    LatLng destination = new LatLng(point2.latitude, point2.longitude);
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
         GoogleMaps.google_api_key, point1, point2);
 
@@ -104,8 +98,4 @@ class MapsState with ChangeNotifier {
     ) );
   }
 
-  void onPermissionGranted() {
-    currentLocation = true;
-    notifyListeners();
-  }
 }

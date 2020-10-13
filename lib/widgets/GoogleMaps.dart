@@ -65,7 +65,7 @@ class GoogleMaps extends StatelessWidget {
     await LocationPermissions().requestPermissions();
     permission = await LocationPermissions().checkPermissionStatus();
     if (permission == PermissionStatus.granted)
-      _mapController.onPermissionGranted();
+      _gotoCurrentLocation();
   }
 
   _onMapCreated(GoogleMapController controller) {
@@ -203,7 +203,7 @@ class GoogleMaps extends StatelessWidget {
     return Stack(alignment: Alignment.bottomCenter, children: [
       Consumer<MapsState>(
         builder: (context, mapstate, _) => GoogleMap(
-          myLocationEnabled: mapstate.currentLocation,
+          myLocationEnabled: true,
           onMapCreated: _onMapCreated,
           initialCameraPosition: CameraPosition(
             target: _center,
@@ -233,13 +233,12 @@ class GoogleMaps extends StatelessWidget {
               SizedBox(
                 height: 16.0,
               ),
-              Consumer<MapsState>(
-                  builder: (context, mapState, _) {
-                    if(mapState.markers.length==2)
-                     return button(_showModalBottom, Icons.save);
-                    else
-                      return Container();
-            }),
+              Consumer<MapsState>(builder: (context, mapState, _) {
+                if (mapState.markers.length == 2)
+                  return button(_showModalBottom, Icons.save);
+                else
+                  return Container();
+              }),
             ],
           ),
         ),
