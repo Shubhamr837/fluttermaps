@@ -13,7 +13,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttermapsapp/widgets/SavedRoutesDraggableSheet.dart';
 
 class GoogleMaps extends StatelessWidget {
-
   PermissionStatus permission;
   static String google_api_key = "AIzaSyD2MRJEkAHpBR2P2ZGU-bAGGvpliL4Ao34";
 
@@ -65,10 +64,8 @@ class GoogleMaps extends StatelessWidget {
   _requestPermissions() async {
     await LocationPermissions().requestPermissions();
     permission = await LocationPermissions().checkPermissionStatus();
-    if(permission==PermissionStatus.granted)
+    if (permission == PermissionStatus.granted)
       _mapController.onPermissionGranted();
-
-
   }
 
   _onMapCreated(GoogleMapController controller) {
@@ -142,14 +139,13 @@ class GoogleMaps extends StatelessWidget {
         dest_lat: _mapController.markers[1].position.latitude,
         dest_long: _mapController.markers[1].position.longitude,
       ));
-      _mapController.removePolyline();
+      _mapController.removePolylineAndMarkers();
     } else {
       final SnackBar snackBar = SnackBar(
         content: Text("Please Select a route"),
       );
       Scaffold.of(mContext).showSnackBar(snackBar);
     }
-
   }
 
   _setPolylines() async {
@@ -174,7 +170,17 @@ class GoogleMaps extends StatelessWidget {
         polylineId: PolylineId("poly"),
         color: Colors.red,
         points: polylineCoordinates);
-    _mapController.addPolyline(polyline, _lastMapPosition);
+    _mapController.addPolylineAndDestinationMarker(
+        polyline,
+        new Marker(
+          markerId: MarkerId(_lastMapPosition.toString()),
+          position: _lastMapPosition,
+          infoWindow: InfoWindow(
+            title: 'This is a Title',
+            snippet: 'This is a snippet',
+          ),
+          icon: GoogleMaps.dest,
+        ));
   }
 
   Widget button(Function function, IconData icon) {
@@ -227,7 +233,13 @@ class GoogleMaps extends StatelessWidget {
               SizedBox(
                 height: 16.0,
               ),
-              button(_showModalBottom, Icons.save),
+              Consumer<MapsState>(
+                  builder: (context, mapState, _) {
+                    if(mapState.markers.length==2)
+                     return button(_showModalBottom, Icons.save);
+                    else
+                      return Container();
+            }),
             ],
           ),
         ),
