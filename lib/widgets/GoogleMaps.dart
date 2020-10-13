@@ -13,6 +13,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttermapsapp/widgets/SavedRoutesDraggableSheet.dart';
 
 class GoogleMaps extends StatelessWidget {
+
   PermissionStatus permission;
   static String google_api_key = "AIzaSyD2MRJEkAHpBR2P2ZGU-bAGGvpliL4Ao34";
 
@@ -62,7 +63,12 @@ class GoogleMaps extends StatelessWidget {
   }
 
   _requestPermissions() async {
-    permission = await LocationPermissions().requestPermissions();
+    await LocationPermissions().requestPermissions();
+    permission = await LocationPermissions().checkPermissionStatus();
+    if(permission==PermissionStatus.granted)
+      _mapController.onPermissionGranted();
+
+
   }
 
   _onMapCreated(GoogleMapController controller) {
@@ -191,7 +197,7 @@ class GoogleMaps extends StatelessWidget {
     return Stack(alignment: Alignment.bottomCenter, children: [
       Consumer<MapsState>(
         builder: (context, mapstate, _) => GoogleMap(
-          myLocationEnabled: true,
+          myLocationEnabled: mapstate.currentLocation,
           onMapCreated: _onMapCreated,
           initialCameraPosition: CameraPosition(
             target: _center,

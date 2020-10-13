@@ -8,17 +8,23 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
-class MapsState with ChangeNotifier{
-
+class MapsState with ChangeNotifier {
   Set<Polyline> _polylines = {};
   List<Marker> _markers = [];
   MapType _mapType = MapType.normal;
   Completer<GoogleMapController> _controller = Completer();
+  bool _currentLocation = false;
+
+  bool get currentLocation => _currentLocation;
+
+  set currentLocation(bool value) {
+    _currentLocation = value;
+  }
 
   MapType get mapType => _mapType;
 
   Set<Polyline> get polylines => _polylines;
+
   List<Marker> get markers => _markers;
 
   set mapType(MapType value) {
@@ -29,27 +35,24 @@ class MapsState with ChangeNotifier{
   Completer<GoogleMapController> get controller => _controller;
 
   void addMarker(Marker value) {
-
     _markers.add(value);
     notifyListeners();
   }
 
-  void addPolyline(Polyline value,LatLng position) {
+  void addPolyline(Polyline value, LatLng position) {
     _polylines.add(value);
-    addMarker( Marker(
+    addMarker(Marker(
       markerId: MarkerId(position.toString()),
       position: position,
       infoWindow: InfoWindow(
         title: 'This is a Title',
         snippet: 'This is a snippet',
       ),
-      icon: GoogleMaps.dest
-      ,
+      icon: GoogleMaps.dest,
     ));
   }
 
-  void removePolyline()
-  {
+  void removePolyline() {
     _polylines.clear();
     _markers.clear();
     notifyListeners();
@@ -66,18 +69,17 @@ class MapsState with ChangeNotifier{
     notifyListeners();
   }
 
-  void displayRoute(PointLatLng point1,PointLatLng point2) async{
+  void displayRoute(PointLatLng point1, PointLatLng point2) async {
     _polylines.clear();
     _markers.clear();
     _markers.add(new Marker(
       markerId: MarkerId(point1.toString()),
-      position: LatLng(point1.latitude,point1.longitude),
+      position: LatLng(point1.latitude, point1.longitude),
       infoWindow: InfoWindow(
         title: 'This is a Title',
         snippet: 'This is a snippet',
       ),
       icon: GoogleMaps.source,
-
     ));
     PolylinePoints polylinePoints = PolylinePoints();
     List<LatLng> polylineCoordinates = [];
@@ -99,8 +101,11 @@ class MapsState with ChangeNotifier{
         polylineId: PolylineId("poly"),
         color: Colors.red,
         points: polylineCoordinates);
-        addPolyline(polyline, new LatLng(point2.latitude, point2.longitude));
+    addPolyline(polyline, new LatLng(point2.latitude, point2.longitude));
   }
 
-
+  void onPermissionGranted() {
+    currentLocation = true;
+    notifyListeners();
+  }
 }
